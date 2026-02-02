@@ -1,0 +1,1305 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Комбайн управління заявками</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f7fa;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .user-role {
+            background-color: rgba(255, 255, 255, 0.2);
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+        
+        .logout-btn {
+            background-color: #ff4757;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .login-screen {
+            padding: 40px;
+            text-align: center;
+        }
+        
+        .login-form {
+            max-width: 400px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .login-form h2 {
+            margin-top: 0;
+            color: #2a5298;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        
+        .login-btn {
+            background-color: #2a5298;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+            margin-top: 10px;
+        }
+        
+        .dashboard {
+            display: none;
+            padding: 30px;
+        }
+        
+        .tab-container {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+        
+        .tab {
+            padding: 15px 25px;
+            cursor: pointer;
+            font-weight: 600;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+        
+        .tab.active {
+            color: #2a5298;
+            border-bottom: 3px solid #2a5298;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .manager-form {
+            background-color: #f9fafc;
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border: 1px solid #eef2f7;
+        }
+        
+        .form-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 15px;
+        }
+        
+        .form-field {
+            flex: 1 1 300px;
+        }
+        
+        .form-field label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2a5298;
+        }
+        
+        .form-field input, .form-field select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        
+        .submit-btn {
+            background-color: #2a5298;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+        
+        .requests-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        .requests-table th, .requests-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .requests-table th {
+            background-color: #f1f5fd;
+            font-weight: 600;
+            color: #2a5298;
+        }
+        
+        .requests-table tr:hover {
+            background-color: #f9fafc;
+        }
+        
+        .status-in-progress {
+            background-color: #ffd32a;
+            color: #333;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+        
+        .status-completed {
+            background-color: #0be881;
+            color: #333;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+        
+        .action-btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-right: 5px;
+        }
+        
+        .complete-btn {
+            background-color: #0be881;
+            color: #333;
+        }
+        
+        .admin-section {
+            background-color: #f9fafc;
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+        
+        .analytics-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .analytics-card {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+        }
+        
+        .analytics-card h3 {
+            margin-top: 0;
+            color: #2a5298;
+            border-bottom: 2px solid #f1f5fd;
+            padding-bottom: 10px;
+        }
+        
+        .stat-value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #2a5298;
+            margin: 15px 0;
+        }
+        
+        .chart-container {
+            height: 200px;
+            margin-top: 20px;
+        }
+        
+        .chart-bar {
+            display: flex;
+            align-items: flex-end;
+            height: 150px;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .chart-bar-item {
+            flex: 1;
+            background-color: #2a5298;
+            border-radius: 5px 5px 0 0;
+            position: relative;
+            min-height: 10px;
+        }
+        
+        .chart-bar-label {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+        
+        .admin-controls {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .add-admin-btn {
+            background-color: #2a5298;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 5px;
+            color: white;
+            font-weight: 600;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            display: none;
+        }
+        
+        .notification.success {
+            background-color: #0be881;
+        }
+        
+        .notification.error {
+            background-color: #ff4757;
+        }
+        
+        @media (max-width: 768px) {
+            .form-row {
+                flex-direction: column;
+            }
+            
+            .form-field {
+                flex: 1 1 100%;
+            }
+            
+            .analytics-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Вхід в систему -->
+        <div id="loginScreen" class="login-screen">
+            <div class="login-form">
+                <h2>Вхід в систему</h2>
+                <div class="form-group">
+                    <label for="loginType">Тип користувача</label>
+                    <select id="loginType">
+                        <option value="manager">Менеджер</option>
+                        <option value="admin">Адміністратор</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="username">Логін</label>
+                    <input type="text" id="username" placeholder="Введіть логін">
+                </div>
+                <div class="form-group">
+                    <label for="password">Пароль</label>
+                    <input type="password" id="password" placeholder="Введіть пароль">
+                </div>
+                <button class="login-btn" id="loginBtn">Увійти</button>
+                
+                <div style="margin-top: 20px; text-align: left; font-size: 14px; color: #666;">
+                    <p><strong>Тестові облікові дані:</strong></p>
+                    <p><strong>Менеджери:</strong> Логін: ім'я (напр. "Євгеній"), Пароль: 123456</p>
+                    <p><strong>Адміністратори:</strong> Логін: "admin1", Пароль: admin123</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Головна панель після входу -->
+        <div id="dashboard" class="dashboard">
+            <header>
+                <div class="logo">Комбайн управління заявками</div>
+                <div class="user-info">
+                    <div id="currentUser">Користувач</div>
+                    <div id="currentRole" class="user-role">Роль</div>
+                    <button class="logout-btn" id="logoutBtn">Вийти</button>
+                </div>
+            </header>
+            
+            <!-- Вкладки для менеджера -->
+            <div id="managerTabs" class="tab-container">
+                <div class="tab active" data-tab="newRequest">Нова заявка</div>
+                <div class="tab" data-tab="myRequests">Мої заявки</div>
+            </div>
+            
+            <!-- Вкладки для адміністратора -->
+            <div id="adminTabs" class="tab-container">
+                <div class="tab active" data-tab="allRequests">Всі заявки</div>
+                <div class="tab" data-tab="analytics">Аналітика</div>
+                <div class="tab" data-tab="adminManagement">Керування адміністраторами</div>
+            </div>
+            
+            <!-- Контент для менеджера -->
+            <div id="managerContent">
+                <!-- Форма нової заявки -->
+                <div id="newRequest" class="tab-content active">
+                    <h2>Нова заявка</h2>
+                    <div class="manager-form">
+                        <div class="form-row">
+                            <div class="form-field">
+                                <label for="client">Клієнт</label>
+                                <input type="text" id="client" placeholder="Введіть назву клієнта">
+                            </div>
+                            <div class="form-field">
+                                <label for="utNumber">УТ-"" від ""</label>
+                                <input type="text" id="utNumber" placeholder="Наприклад: УТ-123 від 25.12.2023">
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-field">
+                                <label for="utAmount">Сума УТ</label>
+                                <input type="number" id="utAmount" placeholder="Введіть суму">
+                            </div>
+                            <div class="form-field">
+                                <label for="goodsAmount">Товарів на суму</label>
+                                <input type="number" id="goodsAmount" placeholder="Введіть суму товарів">
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-field">
+                                <label for="ultraMinus">Ультра мінус</label>
+                                <input type="number" id="ultraMinus" placeholder="Введіть суму ультра мінус">
+                            </div>
+                            <div class="form-field">
+                                <label for="delivery">Доставка</label>
+                                <input type="number" id="delivery" placeholder="Введіть вартість доставки">
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-field">
+                                <label for="bonusAmount">Бонус у розмірі</label>
+                                <input type="number" id="bonusAmount" placeholder="Введіть розмір бонусу">
+                            </div>
+                            <div class="form-field">
+                                <label for="bonusCalculation">Розрахунок бонусу</label>
+                                <input type="text" id="bonusCalculation" placeholder="Опишіть розрахунок бонусу">
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-field">
+                                <label for="paymentCard">Картка для виплати</label>
+                                <input type="text" id="paymentCard" placeholder="Введіть номер картки">
+                            </div>
+                            <div class="form-field">
+                                <label for="recipientData">Дані отримувача</label>
+                                <input type="text" id="recipientData" placeholder="ПІБ отримувача">
+                            </div>
+                        </div>
+                        
+                        <button class="submit-btn" id="submitRequest">Надіслати заявку</button>
+                    </div>
+                </div>
+                
+                <!-- Мої заявки -->
+                <div id="myRequests" class="tab-content">
+                    <h2>Мої заявки</h2>
+                    <table class="requests-table" id="managerRequestsTable">
+                        <thead>
+                            <tr>
+                                <th>Дата</th>
+                                <th>Клієнт</th>
+                                <th>УТ</th>
+                                <th>Сума УТ</th>
+                                <th>Бонус</th>
+                                <th>Статус</th>
+                            </tr>
+                        </thead>
+                        <tbody id="managerRequestsBody">
+                            <!-- Дані будуть додані через JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Контент для адміністратора -->
+            <div id="adminContent">
+                <!-- Всі заявки -->
+                <div id="allRequests" class="tab-content active">
+                    <h2>Всі заявки менеджерів</h2>
+                    <div class="admin-controls">
+                        <select id="filterManager">
+                            <option value="">Всі менеджери</option>
+                            <!-- Опції будуть додані через JavaScript -->
+                        </select>
+                        <select id="filterStatus">
+                            <option value="">Всі статуси</option>
+                            <option value="in-progress">В роботі</option>
+                            <option value="completed">Виконано</option>
+                        </select>
+                        <input type="date" id="filterDateFrom">
+                        <input type="date" id="filterDateTo">
+                        <button id="applyFilter">Застосувати</button>
+                    </div>
+                    
+                    <table class="requests-table" id="adminRequestsTable">
+                        <thead>
+                            <tr>
+                                <th>Дата</th>
+                                <th>Менеджер</th>
+                                <th>Клієнт</th>
+                                <th>УТ</th>
+                                <th>Сума УТ</th>
+                                <th>Товари</th>
+                                <th>Бонус</th>
+                                <th>Статус</th>
+                                <th>Дії</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminRequestsBody">
+                            <!-- Дані будуть додані через JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Аналітика -->
+                <div id="analytics" class="tab-content">
+                    <h2>Аналітика</h2>
+                    <div class="analytics-container">
+                        <div class="analytics-card">
+                            <h3>Загальна сума УТ</h3>
+                            <div class="stat-value" id="totalUtAmount">0</div>
+                            <div>За весь період</div>
+                        </div>
+                        
+                        <div class="analytics-card">
+                            <h3>Загальна сума бонусів</h3>
+                            <div class="stat-value" id="totalBonusAmount">0</div>
+                            <div>За весь період</div>
+                        </div>
+                        
+                        <div class="analytics-card">
+                            <h3>Кількість заявок</h3>
+                            <div class="stat-value" id="totalRequests">0</div>
+                            <div>За весь період</div>
+                        </div>
+                    </div>
+                    
+                    <div class="analytics-card">
+                        <h3>Заявки по менеджерам</h3>
+                        <div class="chart-container">
+                            <div class="chart-bar" id="managersChart">
+                                <!-- Графік буде створено через JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="analytics-card">
+                        <h3>Заявки по дням</h3>
+                        <div class="chart-container">
+                            <div class="chart-bar" id="daysChart">
+                                <!-- Графік буде створено через JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Керування адміністраторами -->
+                <div id="adminManagement" class="tab-content">
+                    <h2>Керування адміністраторами</h2>
+                    <div class="admin-section">
+                        <h3>Додати нового адміністратора</h3>
+                        <div class="form-row">
+                            <div class="form-field">
+                                <label for="newAdminName">ПІБ адміністратора</label>
+                                <input type="text" id="newAdminName" placeholder="Введіть ПІБ">
+                            </div>
+                            <div class="form-field">
+                                <label for="newAdminLogin">Логін</label>
+                                <input type="text" id="newAdminLogin" placeholder="Введіть логін">
+                            </div>
+                            <div class="form-field">
+                                <label for="newAdminPassword">Пароль</label>
+                                <input type="password" id="newAdminPassword" placeholder="Введіть пароль">
+                            </div>
+                        </div>
+                        <button class="add-admin-btn" id="addAdminBtn">Додати адміністратора</button>
+                    </div>
+                    
+                    <div class="admin-section">
+                        <h3>Список адміністраторів</h3>
+                        <table class="requests-table">
+                            <thead>
+                                <tr>
+                                    <th>ПІБ</th>
+                                    <th>Логін</th>
+                                    <th>Дата додавання</th>
+                                </tr>
+                            </thead>
+                            <tbody id="adminsList">
+                                <!-- Дані будуть додані через JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Сповіщення -->
+    <div id="notification" class="notification"></div>
+    
+    <script>
+        // Дані системи
+        const managers = [
+            { name: "Євгеній", login: "Євгеній", password: "123456" },
+            { name: "Дмитро", login: "Дмитро", password: "123456" },
+            { name: "Павло", login: "Павло", password: "123456" },
+            { name: "Сергій Н", login: "Сергій Н", password: "123456" },
+            { name: "Сергій Г", login: "Сергій Г", password: "123456" },
+            { name: "Михайло", login: "Михайло", password: "123456" },
+            { name: "Ігор", login: "Ігор", password: "123456" },
+            { name: "Володимир", login: "Володимир", password: "123456" }
+        ];
+        
+        const admins = [
+            { name: "Шокало Євгеній", login: "admin1", password: "admin123" },
+            { name: "Адмін 2", login: "admin2", password: "admin123" },
+            { name: "Адмін 3", login: "admin3", password: "admin123" },
+            { name: "Адмін 4", login: "admin4", password: "admin123" }
+        ];
+        
+        // Імітація бази даних заявок
+        let requests = [
+            {
+                id: 1,
+                date: "2023-12-01",
+                manager: "Євгеній",
+                client: "ТОВ 'Ромашка'",
+                utNumber: "УТ-123 від 01.12.2023",
+                utAmount: 15000,
+                goodsAmount: 14000,
+                ultraMinus: 500,
+                delivery: 300,
+                bonusAmount: 1500,
+                bonusCalculation: "10% від суми УТ",
+                paymentCard: "5168 **** **** 1234",
+                recipientData: "Петренко Іван Іванович",
+                status: "completed"
+            },
+            {
+                id: 2,
+                date: "2023-12-05",
+                manager: "Дмитро",
+                client: "ФОП Сидоренко",
+                utNumber: "УТ-124 від 05.12.2023",
+                utAmount: 22000,
+                goodsAmount: 20000,
+                ultraMinus: 800,
+                delivery: 400,
+                bonusAmount: 2200,
+                bonusCalculation: "10% від суми УТ",
+                paymentCard: "5168 **** **** 5678",
+                recipientData: "Сидоренко Олександр Петрович",
+                status: "in-progress"
+            },
+            {
+                id: 3,
+                date: "2023-12-10",
+                manager: "Павло",
+                client: "ТОВ 'Соняшник'",
+                utNumber: "УТ-125 від 10.12.2023",
+                utAmount: 18000,
+                goodsAmount: 17000,
+                ultraMinus: 600,
+                delivery: 350,
+                bonusAmount: 1800,
+                bonusCalculation: "10% від суми УТ",
+                paymentCard: "5168 **** **** 9012",
+                recipientData: "Коваленко Сергій Миколайович",
+                status: "in-progress"
+            }
+        ];
+        
+        // Поточний користувач
+        let currentUser = null;
+        let currentRole = null;
+        
+        // DOM елементи
+        const loginScreen = document.getElementById('loginScreen');
+        const dashboard = document.getElementById('dashboard');
+        const loginBtn = document.getElementById('loginBtn');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const currentUserElement = document.getElementById('currentUser');
+        const currentRoleElement = document.getElementById('currentRole');
+        const managerTabs = document.getElementById('managerTabs');
+        const adminTabs = document.getElementById('adminTabs');
+        const managerContent = document.getElementById('managerContent');
+        const adminContent = document.getElementById('adminContent');
+        const submitRequestBtn = document.getElementById('submitRequest');
+        const notification = document.getElementById('notification');
+        
+        // Ініціалізація
+        document.addEventListener('DOMContentLoaded', function() {
+            // Налаштування події входу
+            loginBtn.addEventListener('click', handleLogin);
+            
+            // Налаштування події виходу
+            logoutBtn.addEventListener('click', handleLogout);
+            
+            // Налаштування події відправки заявки
+            submitRequestBtn.addEventListener('click', handleSubmitRequest);
+            
+            // Налаштування вкладок
+            setupTabs();
+            
+            // Налаштування фільтрів адміністратора
+            document.getElementById('applyFilter').addEventListener('click', applyFilters);
+            
+            // Налаштування додавання адміністратора
+            document.getElementById('addAdminBtn').addEventListener('click', addNewAdmin);
+            
+            // Заповнення фільтрів менеджерів
+            populateManagerFilter();
+            
+            // Перевірка, чи користувач вже ввійшов (для демонстрації)
+            const savedUser = localStorage.getItem('currentUser');
+            const savedRole = localStorage.getItem('currentRole');
+            
+            if (savedUser && savedRole) {
+                currentUser = savedUser;
+                currentRole = savedRole;
+                showDashboard();
+            }
+        });
+        
+        // Обробка входу
+        function handleLogin() {
+            const loginType = document.getElementById('loginType').value;
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
+            
+            if (!username || !password) {
+                showNotification('Будь ласка, заповніть всі поля', 'error');
+                return;
+            }
+            
+            if (loginType === 'manager') {
+                // Перевірка менеджера
+                const manager = managers.find(m => m.login === username && m.password === password);
+                if (manager) {
+                    currentUser = manager.name;
+                    currentRole = 'manager';
+                    localStorage.setItem('currentUser', currentUser);
+                    localStorage.setItem('currentRole', currentRole);
+                    showDashboard();
+                } else {
+                    showNotification('Невірний логін або пароль для менеджера', 'error');
+                }
+            } else {
+                // Перевірка адміністратора
+                const admin = admins.find(a => a.login === username && a.password === password);
+                if (admin) {
+                    currentUser = admin.name;
+                    currentRole = 'admin';
+                    localStorage.setItem('currentUser', currentUser);
+                    localStorage.setItem('currentRole', currentRole);
+                    showDashboard();
+                } else {
+                    showNotification('Невірний логін або пароль для адміністратора', 'error');
+                }
+            }
+        }
+        
+        // Показати панель управління
+        function showDashboard() {
+            loginScreen.style.display = 'none';
+            dashboard.style.display = 'block';
+            
+            // Оновити інформацію про користувача
+            currentUserElement.textContent = currentUser;
+            currentRoleElement.textContent = currentRole === 'manager' ? 'Менеджер' : 'Адміністратор';
+            
+            // Показати відповідні вкладки та контент
+            if (currentRole === 'manager') {
+                managerTabs.style.display = 'flex';
+                adminTabs.style.display = 'none';
+                managerContent.style.display = 'block';
+                adminContent.style.display = 'none';
+                
+                // Завантажити заявки менеджера
+                loadManagerRequests();
+            } else {
+                managerTabs.style.display = 'none';
+                adminTabs.style.display = 'flex';
+                managerContent.style.display = 'none';
+                adminContent.style.display = 'block';
+                
+                // Завантажити всі заявки
+                loadAllRequests();
+                
+                // Завантажити аналітику
+                loadAnalytics();
+                
+                // Завантажити список адміністраторів
+                loadAdminsList();
+            }
+        }
+        
+        // Обробка виходу
+        function handleLogout() {
+            currentUser = null;
+            currentRole = null;
+            localStorage.removeItem('currentUser');
+            localStorage.removeItem('currentRole');
+            
+            // Скинути форму входу
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+            
+            dashboard.style.display = 'none';
+            loginScreen.style.display = 'block';
+        }
+        
+        // Налаштування вкладок
+        function setupTabs() {
+            // Вкладки менеджера
+            const managerTabElements = managerTabs.querySelectorAll('.tab');
+            managerTabElements.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const tabId = this.getAttribute('data-tab');
+                    
+                    // Активувати вкладку
+                    managerTabElements.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Показати відповідний контент
+                    const tabContents = managerContent.querySelectorAll('.tab-content');
+                    tabContents.forEach(content => {
+                        content.classList.remove('active');
+                        if (content.id === tabId) {
+                            content.classList.add('active');
+                        }
+                    });
+                    
+                    // Якщо це вкладка "Мої заявки", оновити таблицю
+                    if (tabId === 'myRequests') {
+                        loadManagerRequests();
+                    }
+                });
+            });
+            
+            // Вкладки адміністратора
+            const adminTabElements = adminTabs.querySelectorAll('.tab');
+            adminTabElements.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const tabId = this.getAttribute('data-tab');
+                    
+                    // Активувати вкладку
+                    adminTabElements.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Показати відповідний контент
+                    const tabContents = adminContent.querySelectorAll('.tab-content');
+                    tabContents.forEach(content => {
+                        content.classList.remove('active');
+                        if (content.id === tabId) {
+                            content.classList.add('active');
+                        }
+                    });
+                    
+                    // Завантажити дані для відповідної вкладки
+                    if (tabId === 'allRequests') {
+                        loadAllRequests();
+                    } else if (tabId === 'analytics') {
+                        loadAnalytics();
+                    } else if (tabId === 'adminManagement') {
+                        loadAdminsList();
+                    }
+                });
+            });
+        }
+        
+        // Обробка відправки нової заявки
+        function handleSubmitRequest() {
+            // Збір даних з форми
+            const client = document.getElementById('client').value.trim();
+            const utNumber = document.getElementById('utNumber').value.trim();
+            const utAmount = parseFloat(document.getElementById('utAmount').value) || 0;
+            const goodsAmount = parseFloat(document.getElementById('goodsAmount').value) || 0;
+            const ultraMinus = parseFloat(document.getElementById('ultraMinus').value) || 0;
+            const delivery = parseFloat(document.getElementById('delivery').value) || 0;
+            const bonusAmount = parseFloat(document.getElementById('bonusAmount').value) || 0;
+            const bonusCalculation = document.getElementById('bonusCalculation').value.trim();
+            const paymentCard = document.getElementById('paymentCard').value.trim();
+            const recipientData = document.getElementById('recipientData').value.trim();
+            
+            // Валідація обов'язкових полів
+            if (!client || !utNumber || !paymentCard || !recipientData) {
+                showNotification('Будь ласка, заповніть всі обов\'язкові поля', 'error');
+                return;
+            }
+            
+            // Створення нової заявки
+            const newRequest = {
+                id: requests.length + 1,
+                date: new Date().toISOString().split('T')[0], // Поточна дата
+                manager: currentUser,
+                client,
+                utNumber,
+                utAmount,
+                goodsAmount,
+                ultraMinus,
+                delivery,
+                bonusAmount,
+                bonusCalculation,
+                paymentCard,
+                recipientData,
+                status: 'in-progress'
+            };
+            
+            // Додавання заявки до "бази даних"
+            requests.push(newRequest);
+            
+            // Очищення форми
+            clearForm();
+            
+            // Показ сповіщення
+            showNotification('Заявку успішно надіслано!', 'success');
+            
+            // Перехід до вкладки з заявками
+            const myRequestsTab = managerTabs.querySelector('[data-tab="myRequests"]');
+            myRequestsTab.click();
+        }
+        
+        // Очищення форми
+        function clearForm() {
+            document.getElementById('client').value = '';
+            document.getElementById('utNumber').value = '';
+            document.getElementById('utAmount').value = '';
+            document.getElementById('goodsAmount').value = '';
+            document.getElementById('ultraMinus').value = '';
+            document.getElementById('delivery').value = '';
+            document.getElementById('bonusAmount').value = '';
+            document.getElementById('bonusCalculation').value = '';
+            document.getElementById('paymentCard').value = '';
+            document.getElementById('recipientData').value = '';
+        }
+        
+        // Завантаження заявок менеджера
+        function loadManagerRequests() {
+            const tbody = document.getElementById('managerRequestsBody');
+            tbody.innerHTML = '';
+            
+            // Фільтрація заявок поточного менеджера
+            const managerRequests = requests.filter(req => req.manager === currentUser);
+            
+            // Сортування за датою (новіші перші)
+            managerRequests.sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            // Додавання рядків до таблиці
+            managerRequests.forEach(request => {
+                const row = document.createElement('tr');
+                
+                // Форматування статусу
+                let statusBadge = '';
+                if (request.status === 'in-progress') {
+                    statusBadge = '<span class="status-in-progress">В роботі</span>';
+                } else {
+                    statusBadge = '<span class="status-completed">Виконано</span>';
+                }
+                
+                row.innerHTML = `
+                    <td>${request.date}</td>
+                    <td>${request.client}</td>
+                    <td>${request.utNumber}</td>
+                    <td>${request.utAmount.toLocaleString()} грн</td>
+                    <td>${request.bonusAmount.toLocaleString()} грн</td>
+                    <td>${statusBadge}</td>
+                `;
+                
+                tbody.appendChild(row);
+            });
+            
+            // Якщо заявок немає
+            if (managerRequests.length === 0) {
+                const row = document.createElement('tr');
+                row.innerHTML = `<td colspan="6" style="text-align: center;">У вас ще немає заявок</td>`;
+                tbody.appendChild(row);
+            }
+        }
+        
+        // Завантаження всіх заявок для адміністратора
+        function loadAllRequests() {
+            const tbody = document.getElementById('adminRequestsBody');
+            tbody.innerHTML = '';
+            
+            // Фільтрація заявок (якщо застосовано фільтри)
+            let filteredRequests = [...requests];
+            
+            const managerFilter = document.getElementById('filterManager').value;
+            const statusFilter = document.getElementById('filterStatus').value;
+            const dateFrom = document.getElementById('filterDateFrom').value;
+            const dateTo = document.getElementById('filterDateTo').value;
+            
+            if (managerFilter) {
+                filteredRequests = filteredRequests.filter(req => req.manager === managerFilter);
+            }
+            
+            if (statusFilter) {
+                filteredRequests = filteredRequests.filter(req => req.status === statusFilter);
+            }
+            
+            if (dateFrom) {
+                filteredRequests = filteredRequests.filter(req => new Date(req.date) >= new Date(dateFrom));
+            }
+            
+            if (dateTo) {
+                filteredRequests = filteredRequests.filter(req => new Date(req.date) <= new Date(dateTo));
+            }
+            
+            // Сортування за датою (новіші перші)
+            filteredRequests.sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            // Додавання рядків до таблиці
+            filteredRequests.forEach(request => {
+                const row = document.createElement('tr');
+                
+                // Форматування статусу
+                let statusBadge = '';
+                if (request.status === 'in-progress') {
+                    statusBadge = '<span class="status-in-progress">В роботі</span>';
+                } else {
+                    statusBadge = '<span class="status-completed">Виконано</span>';
+                }
+                
+                // Кнопка для зміни статусу
+                let actionButton = '';
+                if (request.status === 'in-progress') {
+                    actionButton = `<button class="action-btn complete-btn" data-id="${request.id}">Виконано</button>`;
+                }
+                
+                row.innerHTML = `
+                    <td>${request.date}</td>
+                    <td>${request.manager}</td>
+                    <td>${request.client}</td>
+                    <td>${request.utNumber}</td>
+                    <td>${request.utAmount.toLocaleString()} грн</td>
+                    <td>${request.goodsAmount.toLocaleString()} грн</td>
+                    <td>${request.bonusAmount.toLocaleString()} грн</td>
+                    <td>${statusBadge}</td>
+                    <td>${actionButton}</td>
+                `;
+                
+                tbody.appendChild(row);
+            });
+            
+            // Додавання обробників подій для кнопок
+            tbody.querySelectorAll('.complete-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const requestId = parseInt(this.getAttribute('data-id'));
+                    completeRequest(requestId);
+                });
+            });
+            
+            // Якщо заявок немає
+            if (filteredRequests.length === 0) {
+                const row = document.createElement('tr');
+                row.innerHTML = `<td colspan="9" style="text-align: center;">Заявок не знайдено</td>`;
+                tbody.appendChild(row);
+            }
+        }
+        
+        // Застосування фільтрів
+        function applyFilters() {
+            loadAllRequests();
+        }
+        
+        // Заповнення фільтра менеджерів
+        function populateManagerFilter() {
+            const filterManager = document.getElementById('filterManager');
+            
+            // Додавання менеджерів до фільтра
+            managers.forEach(manager => {
+                const option = document.createElement('option');
+                option.value = manager.name;
+                option.textContent = manager.name;
+                filterManager.appendChild(option);
+            });
+        }
+        
+        // Завантаження аналітики
+        function loadAnalytics() {
+            // Загальна сума УТ
+            const totalUtAmount = requests.reduce((sum, req) => sum + req.utAmount, 0);
+            document.getElementById('totalUtAmount').textContent = totalUtAmount.toLocaleString() + ' грн';
+            
+            // Загальна сума бонусів
+            const totalBonusAmount = requests.reduce((sum, req) => sum + req.bonusAmount, 0);
+            document.getElementById('totalBonusAmount').textContent = totalBonusAmount.toLocaleString() + ' грн';
+            
+            // Загальна кількість заявок
+            document.getElementById('totalRequests').textContent = requests.length;
+            
+            // Створення графіка по менеджерах
+            createManagersChart();
+            
+            // Створення графіка по днях
+            createDaysChart();
+        }
+        
+        // Створення графіка по менеджерах
+        function createManagersChart() {
+            const managersChart = document.getElementById('managersChart');
+            managersChart.innerHTML = '';
+            
+            // Групування заявок по менеджерах
+            const managerStats = {};
+            managers.forEach(manager => {
+                managerStats[manager.name] = 0;
+            });
+            
+            requests.forEach(request => {
+                if (managerStats.hasOwnProperty(request.manager)) {
+                    managerStats[request.manager]++;
+                }
+            });
+            
+            // Визначення максимального значення для масштабування
+            const maxValue = Math.max(...Object.values(managerStats));
+            
+            // Створення стовпців графіка
+            Object.keys(managerStats).forEach(managerName => {
+                const value = managerStats[managerName];
+                const height = maxValue > 0 ? (value / maxValue) * 100 : 0;
+                
+                const barContainer = document.createElement('div');
+                barContainer.style.flex = '1';
+                barContainer.style.display = 'flex';
+                barContainer.style.flexDirection = 'column';
+                barContainer.style.alignItems = 'center';
+                
+                const bar = document.createElement('div');
+                bar.className = 'chart-bar-item';
+                bar.style.height = `${height}%`;
+                bar.title = `${value} заявок`;
+                
+                const label = document.createElement('div');
+                label.className = 'chart-bar-label';
+                label.textContent = managerName;
+                
+                barContainer.appendChild(bar);
+                barContainer.appendChild(label);
+                managersChart.appendChild(barContainer);
+            });
+        }
+        
+        // Створення графіка по днях
+        function createDaysChart() {
+            const daysChart = document.getElementById('daysChart');
+            daysChart.innerHTML = '';
+            
+            // Групування заявок по днях (останні 7 днів)
+            const last7Days = [];
+            for (let i = 6; i >= 0; i--) {
+                const date = new Date();
+                date.setDate(date.getDate() - i);
+                const dateString = date.toISOString().split('T')[0];
+                last7Days.push({
+                    date: dateString,
+                    displayDate: date.toLocaleDateString('uk-UA', { day: 'numeric', month: 'short' }),
+                    count: 0
+                });
+            }
+            
+            // Підрахунок заявок по днях
+            requests.forEach(request => {
+                const requestDate = request.date;
+                const dayStat = last7Days.find(day => day.date === requestDate);
+                if (dayStat) {
+                    dayStat.count++;
+                }
+            });
+            
+            // Визначення максимального значення для масштабування
+            const maxValue = Math.max(...last7Days.map(day => day.count));
+            
+            // Створення стовпців графіка
+            last7Days.forEach(day => {
+                const height = maxValue > 0 ? (day.count / maxValue) * 100 : 0;
+                
+                const barContainer = document.createElement('div');
+                barContainer.style.flex = '1';
+                barContainer.style.display = 'flex';
+                barContainer.style.flexDirection = 'column';
+                barContainer.style.alignItems = 'center';
+                
+                const bar = document.createElement('div');
+                bar.className = 'chart-bar-item';
+                bar.style.height = `${height}%`;
+                bar.style.backgroundColor = '#0be881';
+                bar.title = `${day.count} заявок`;
+                
+                const label = document.createElement('div');
+                label.className = 'chart-bar-label';
+                label.textContent = day.displayDate;
+                
+                barContainer.appendChild(bar);
+                barContainer.appendChild(label);
+                daysChart.appendChild(barContainer);
+            });
+        }
+        
+        // Завантаження списку адміністраторів
+        function loadAdminsList() {
+            const tbody = document.getElementById('adminsList');
+            tbody.innerHTML = '';
+            
+            // Додавання адміністраторів до таблиці
+            admins.forEach(admin => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${admin.name}</td>
+                    <td>${admin.login}</td>
+                    <td>01.12.2023</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+        
+        // Додавання нового адміністратора
+        function addNewAdmin() {
+            const name = document.getElementById('newAdminName').value.trim();
+            const login = document.getElementById('newAdminLogin').value.trim();
+            const password = document.getElementById('newAdminPassword').value.trim();
+            
+            if (!name || !login || !password) {
+                showNotification('Будь ласка, заповніть всі поля', 'error');
+                return;
+            }
+            
+            // Перевірка, чи логін вже існує
+            if (admins.some(admin => admin.login === login)) {
+                showNotification('Адміністратор з таким логіном вже існує', 'error');
+                return;
+            }
+            
+            // Додавання нового адміністратора
+            admins.push({
+                name,
+                login,
+                password
+            });
+            
+            // Очищення полів
+            document.getElementById('newAdminName').value = '';
+            document.getElementById('newAdminLogin').value = '';
+            document.getElementById('newAdminPassword').value = '';
+            
+            // Оновлення списку
+            loadAdminsList();
+            
+            showNotification('Нового адміністратора успішно додано', 'success');
+        }
+        
+        // Завершення заявки
+        function completeRequest(requestId) {
+            const requestIndex = requests.findIndex(req => req.id === requestId);
+            
+            if (requestIndex !== -1) {
+                requests[requestIndex].status = 'completed';
+                loadAllRequests();
+                loadAnalytics();
+                showNotification('Заявку успішно завершено', 'success');
+            }
+        }
+        
+        // Показати сповіщення
+        function showNotification(message, type) {
+            notification.textContent = message;
+            notification.className = `notification ${type}`;
+            notification.style.display = 'block';
+            
+            // Автоматичне приховування сповіщення через 3 секунди
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
